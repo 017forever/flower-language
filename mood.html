@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>心情量表 · 花語心情</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500&family=Noto+Sans+TC:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      background: #f7f0f5;
+      min-height: 100vh;
+      color: #4a2040;
+    }
+
+    /* ── 導覽列 ── */
+    nav {
+      background: #ffffff;
+      border-bottom: 0.5px solid #e8d5e5;
+      padding: 0 2rem;
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-logo {
+      font-family: 'Noto Serif TC', serif;
+      font-size: 17px;
+      font-weight: 500;
+      color: #4a2040;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .nav-links {
+      display: flex;
+      gap: 4px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 14px;
+      color: #9a7090;
+      text-decoration: none;
+      padding: 7px 12px;
+      border-radius: 10px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .nav-links a:hover,
+    .nav-links a.active { background: #f5edf3; color: #4a2040; }
+    .nav-user {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #7a5070;
+    }
+    .btn-logout {
+      font-size: 12px;
+      color: #b090a8;
+      background: none;
+      border: 0.5px solid #e0cedd;
+      border-radius: 8px;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-family: 'Noto Sans TC', sans-serif;
+      transition: background 0.15s;
+    }
+    .btn-logout:hover { background: #f5edf3; color: #9a4878; }
+    .nav-coins-badge { display:flex; align-items:center; gap:5px; background:#fff8e8; border:0.5px solid #f0d898; border-radius:20px; padding:5px 12px; font-size:13px; font-weight:500; color:#a07020; }
+    main {
+      max-width: 620px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    /* ── 步驟進度條 ── */
+    .steps {
+      display: flex;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      color: #b090a8;
+      white-space: nowrap;
+    }
+    .step.active { color: #b05a8a; font-weight: 500; }
+    .step.done   { color: #5aaa7a; }
+    .step-dot {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 1.5px solid #e0cedd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 500;
+      flex-shrink: 0;
+      background: #ffffff;
+      transition: all 0.2s;
+    }
+    .step.active .step-dot { border-color: #b05a8a; background: #b05a8a; color: #ffffff; }
+    .step.done   .step-dot { border-color: #5aaa7a; background: #5aaa7a; color: #ffffff; }
+    .step-line {
+      flex: 1;
+      height: 0.5px;
+      background: #e0cedd;
+      margin: 0 8px;
+    }
+
+    /* ── 問題卡片 ── */
+    .quiz-card {
+      background: #ffffff;
+      border-radius: 20px;
+      border: 0.5px solid #e8d5e5;
+      padding: 1.75rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .q-progress {
+      font-size: 11px;
+      color: #b090a8;
+      margin-bottom: 8px;
+      letter-spacing: 0.05em;
+    }
+    .progress-bar {
+      height: 3px;
+      background: #f0e0ec;
+      border-radius: 2px;
+      margin-bottom: 1.25rem;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #b05a8a;
+      border-radius: 2px;
+      transition: width 0.3s ease;
+    }
+    .q-text {
+      font-family: 'Noto Serif TC', serif;
+      font-size: 17px;
+      color: #4a2040;
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+    }
+    .options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .opt {
+      padding: 12px 14px;
+      border: 0.5px solid #e0cedd;
+      border-radius: 14px;
+      font-size: 14px;
+      color: #7a5070;
+      cursor: pointer;
+      text-align: center;
+      background: #ffffff;
+      font-family: 'Noto Sans TC', sans-serif;
+      line-height: 1.5;
+      transition: all 0.15s;
+    }
+    .opt:hover    { background: #fdf0f8; border-color: #c07098; }
+    .opt.selected { background: #fdf0f8; border-color: #b05a8a; color: #4a2040; font-weight: 500; }
+
+    /* ── 導航按鈕 ── */
+    .nav-btns {
+      display: flex;
+      gap: 10px;
+    }
+    .btn-back {
+      padding: 12px 20px;
+      background: #f5edf3;
+      color: #7a5070;
+      border: none;
+      border-radius: 14px;
+      font-size: 14px;
+      font-family: 'Noto Sans TC', sans-serif;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-back:hover { background: #eddde8; }
+    .btn-next {
+      flex: 1;
+      padding: 12px;
+      background: #b05a8a;
+      color: #ffffff;
+      border: none;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: 'Noto Sans TC', sans-serif;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .btn-next:hover   { background: #9a4878; }
+    .btn-next:active  { transform: scale(0.98); }
+    .btn-next:disabled { background: #e0cedd; cursor: not-allowed; }
+
+    /* ── 結果頁 ── */
+    .result-wrap { display: none; }
+    .result-header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .result-header h2 {
+      font-family: 'Noto Serif TC', serif;
+      font-size: 16px;
+      font-weight: 400;
+      color: #9a7090;
+    }
+    .result-card {
+      background: #ffffff;
+      border-radius: 20px;
+      border: 0.5px solid #e8d5e5;
+      padding: 2rem 1.5rem;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .result-img {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+      margin: 0 auto 1.25rem;
+      border: 3px solid #f0d0e8;
+      background: #f5edf3;
+    }
+    .result-label {
+      font-size: 11px;
+      color: #b090a8;
+      letter-spacing: 0.1em;
+      margin-bottom: 6px;
+    }
+    .result-name {
+      font-family: 'Noto Serif TC', serif;
+      font-size: 26px;
+      font-weight: 500;
+      color: #4a2040;
+      margin-bottom: 4px;
+    }
+    .result-latin {
+      font-size: 13px;
+      color: #b090a8;
+      font-style: italic;
+      margin-bottom: 1.25rem;
+    }
+    .result-meaning {
+      font-size: 14px;
+      color: #7a5070;
+      line-height: 1.9;
+      margin-bottom: 1.5rem;
+      padding: 0 0.5rem;
+    }
+    .result-btns {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn-primary {
+      padding: 11px 24px;
+      background: #b05a8a;
+      color: #ffffff;
+      border: none;
+      border-radius: 24px;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: 'Noto Sans TC', sans-serif;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      transition: background 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-primary:hover { background: #9a4878; }
+    .btn-secondary {
+      padding: 11px 24px;
+      background: #f5edf3;
+      color: #7a5070;
+      border: none;
+      border-radius: 24px;
+      font-size: 14px;
+      font-family: 'Noto Sans TC', sans-serif;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-secondary:hover { background: #eddde8; }
+
+    /* ── 其他推薦 ── */
+    .other-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: #7a5070;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .other-title::after {
+      content: '';
+      flex: 1;
+      height: 0.5px;
+      background: #e0cedd;
+    }
+    .other-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .other-card {
+      background: #ffffff;
+      border-radius: 14px;
+      border: 0.5px solid #e8d5e5;
+      overflow: hidden;
+      text-align: center;
+    }
+    .other-card img {
+      width: 100%;
+      height: 80px;
+      object-fit: cover;
+      display: block;
+      background: #f5edf3;
+    }
+    .other-card-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: #4a2040;
+      padding: 8px 6px 4px;
+    }
+    .other-card-meaning {
+      font-size: 11px;
+      color: #9a7090;
+      padding: 0 8px 10px;
+      line-height: 1.5;
+    }
+
+    /* ── 手機響應式 ── */
+    @media (max-width: 500px) {
+      nav { padding: 0 1rem; }
+      .nav-links { display: none; }
+      main { padding: 1.25rem 1rem 4rem; }
+      .options { grid-template-columns: 1fr; }
+      .other-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a class="nav-logo" href="home.html">🌸 花語心情</a>
+    <ul class="nav-links">
+      <li><a href="home.html">首頁</a></li>
+      <li><a href="encyclopedia.html">花語圖鑑</a></li>
+      <li><a href="mood.html" class="active">心情量表</a></li>
+      <li><a href="diary.html">心情日記</a></li>
+      <li><a href="community.html">社群</a></li>
+      <li><a href="shop.html">商店</a></li>
+    </ul>
+    <div class="nav-user">
+      <div class="nav-coins-badge">🪙 <span id="nav-coins">0</span></div>
+      <span id="nav-username">使用者</span>
+      <button class="btn-logout" onclick="logout()">登出</button>
+    </div>
+  </nav>
+
+  <main>
+    <!-- 步驟進度 -->
+    <div class="steps">
+      <div class="step active" id="step-1"><div class="step-dot">1</div>心情測驗</div>
+      <div class="step-line"></div>
+      <div class="step" id="step-2"><div class="step-dot">2</div>花語推薦</div>
+      <div class="step-line"></div>
+      <div class="step" id="step-3"><div class="step-dot">3</div>記錄日記</div>
+    </div>
+
+    <!-- 問題區 -->
+    <div id="quiz-wrap">
+      <div class="quiz-card">
+        <div class="q-progress" id="q-progress">第 1 題，共 6 題</div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill" style="width: 16%"></div>
+        </div>
+        <div class="q-text" id="q-text"></div>
+        <div class="options" id="options"></div>
+      </div>
+      <div class="nav-btns">
+        <button class="btn-back" id="btn-back" onclick="prevQ()" style="display:none">← 上一題</button>
+        <button class="btn-next" id="btn-next" onclick="nextQ()" disabled>下一題 →</button>
+      </div>
+    </div>
+
+    <!-- 結果區 -->
+    <div id="result-wrap" class="result-wrap">
+      <div class="result-header">
+        <h2>今天屬於你的花是 🌸</h2>
+      </div>
+      <div class="result-card">
+        <img class="result-img" id="r-img" src="" alt="" />
+        <div class="result-label">TODAY'S FLOWER</div>
+        <div class="result-name" id="r-name"></div>
+        <div class="result-latin" id="r-latin"></div>
+        <div class="result-meaning" id="r-meaning"></div>
+        <div class="result-btns">
+          <a class="btn-primary" id="r-diary-btn" href="diary.html">記錄今日心情 ✦</a>
+          <button class="btn-secondary" onclick="restart()">重新測驗</button>
+        </div>
+      </div>
+
+      <div class="other-title">其他推薦花語</div>
+      <div class="other-grid" id="other-grid"></div>
+    </div>
+  </main>
+
+  <script src="coins.js"></script>
+  <script>
+    /* ── 登入驗證 ── */
+    const currentUser = localStorage.getItem('fl_current');
+    if (!currentUser) window.location.href = 'index.html';
+    document.getElementById('nav-username').textContent = currentUser;
+    Coins.initNav(currentUser);
+
+    /* ── 題目資料 ── */
+    const questions = [
+      {
+        text: '今天整體的心情感覺如何？',
+        opts: ['😊 開心愉快', '😔 有點低落', '😌 平靜安定', '😤 有些煩躁'],
+        scores: [3, 0, 2, 1]
+      },
+      {
+        text: '現在的能量狀態是？',
+        opts: ['⚡ 充滿活力', '🌙 疲憊想休息', '🌿 平穩舒緩', '🌀 有點焦慮'],
+        scores: [3, 0, 2, 1]
+      },
+      {
+        text: '今天最想做的事是？',
+        opts: ['🎉 出去玩、社交', '📖 安靜獨處', '🤝 陪伴重要的人', '🌱 做些有意義的事'],
+        scores: [3, 1, 2, 2]
+      },
+      {
+        text: '對於未來，現在的感受是？',
+        opts: ['🌟 充滿期待', '😟 有些擔心', '😶 不太確定', '💪 準備好了'],
+        scores: [3, 0, 1, 3]
+      },
+      {
+        text: '如果用顏色描述今天的心情？',
+        opts: ['🌸 粉紅（溫柔）', '💙 藍色（沉靜）', '🌻 黃色（明亮）', '💜 紫色（神秘）'],
+        scores: [2, 1, 3, 2]
+      },
+      {
+        text: '今天最需要的是？',
+        opts: ['💖 被愛與關懷', '🌿 平靜與療癒', '⚡ 勇氣與力量', '🌟 希望與期待'],
+        scores: [2, 1, 3, 3]
+      },
+    ];
+
+    /* ── 推薦花語結果 ── */
+    const results = [
+      {
+        min: 0, max: 7,
+        name: '薰衣草', latin: 'Lavandula', tag: '療癒',
+        meaning: '你今天需要一些寧靜與療癒。薰衣草輕柔的紫色與淡淡的香氣，將為你帶來安定的力量，讓心靈慢慢沉澱、找回平靜。',
+        img: 'assets/images/lavender.jpg'
+      },
+      {
+        min: 8, max: 11,
+        name: '桔梗', latin: 'Platycodon', tag: '思念',
+        meaning: '你的心情溫柔而略帶沉靜，如桔梗般在安靜中蘊藏著深刻的情感。今天適合好好與自己對話，感受內心最真實的聲音。',
+        img: 'assets/images/platycodon.jpg'
+      },
+      {
+        min: 12, max: 14,
+        name: '鬱金香', latin: 'Tulipa', tag: '愛情',
+        meaning: '你今天的心情溫柔而平穩，如鬱金香般帶著深情等待綻放。這是一個適合珍惜身邊人、傳遞溫暖的好日子。',
+        img: 'assets/images/tulip.jpg'
+      },
+      {
+        min: 15, max: 16,
+        name: '向日葵', latin: 'Helianthus', tag: '勇氣',
+        meaning: '你今天充滿能量與希望，如向日葵般追著光明、積極向上！帶著這份活力去做你想做的事，今天是個好日子！',
+        img: 'assets/images/sunflower.jpg'
+      },
+      {
+        min: 17, max: 18,
+        name: '玫瑰', latin: 'Rosa', tag: '愛情',
+        meaning: '你今天充滿熱情與勇氣，如玫瑰般熱烈而美麗！這份能量不只屬於你自己，也能感染身邊的人，勇敢地綻放吧！',
+        img: 'assets/images/rose.jpg'
+      },
+    ];
+
+    /* ── 其他推薦花（結果頁底部）── */
+    const otherFlowers = [
+      { name: '繡球花', meaning: '包容與溫柔', img: 'assets/images/hydrangea.jpg' },
+      { name: '雛菊',   meaning: '純真新開始', img: 'assets/images/daisy.jpg' },
+      { name: '睡蓮',   meaning: '清淨與覺醒', img: 'assets/images/water-lily.jpg' },
+    ];
+
+    let currentQ = 0;
+    let answers  = [];
+    let selected = null;
+
+    /* ── 渲染題目 ── */
+    function renderQ() {
+      const q = questions[currentQ];
+      const total = questions.length;
+      const pct = Math.round(((currentQ + 1) / total) * 100);
+
+      document.getElementById('q-progress').textContent = `第 ${currentQ + 1} 題，共 ${total} 題`;
+      document.getElementById('progress-fill').style.width = pct + '%';
+      document.getElementById('q-text').textContent = q.text;
+
+      document.getElementById('options').innerHTML = q.opts.map((o, i) => `
+        <div class="opt${answers[currentQ] === i ? ' selected' : ''}" onclick="selectOpt(${i})">${o}</div>
+      `).join('');
+
+      selected = answers[currentQ] ?? null;
+      document.getElementById('btn-next').disabled = selected === null;
+      document.getElementById('btn-next').textContent =
+        currentQ === total - 1 ? '查看我的花 🌸' : '下一題 →';
+      document.getElementById('btn-back').style.display = currentQ > 0 ? 'block' : 'none';
+    }
+
+    /* ── 選擇選項 ── */
+    function selectOpt(i) {
+      selected = i;
+      answers[currentQ] = i;
+      document.querySelectorAll('.opt').forEach((el, idx) =>
+        el.classList.toggle('selected', idx === i));
+      document.getElementById('btn-next').disabled = false;
+    }
+
+    /* ── 下一題 ── */
+    function nextQ() {
+      if (selected === null) return;
+      if (currentQ < questions.length - 1) {
+        currentQ++;
+        renderQ();
+      } else {
+        showResult();
+      }
+    }
+
+    /* ── 上一題 ── */
+    function prevQ() {
+      if (currentQ > 0) { currentQ--; renderQ(); }
+    }
+
+    /* ── 顯示結果 ── */
+    function showResult() {
+      const total = answers.reduce((sum, a, i) => sum + questions[i].scores[a], 0);
+      const r = results.find(r => total >= r.min && total <= r.max) || results[2];
+
+      document.getElementById('r-img').src = r.img;
+      document.getElementById('r-img').alt = r.name;
+      document.getElementById('r-name').textContent = r.name;
+      document.getElementById('r-latin').textContent = r.latin + '　·　' + r.tag;
+      document.getElementById('r-meaning').textContent = r.meaning;
+
+      /* 帶資料到日記頁 */
+      const diaryBtn = document.getElementById('r-diary-btn');
+      diaryBtn.href = `diary.html?flower=${encodeURIComponent(r.name)}&mood=${encodeURIComponent(r.meaning.slice(0, 20))}`;
+
+      /* 其他推薦 */
+      document.getElementById('other-grid').innerHTML = otherFlowers.map(f => `
+        <div class="other-card">
+          <img src="${f.img}" alt="${f.name}" loading="lazy" />
+          <div class="other-card-name">${f.name}</div>
+          <div class="other-card-meaning">${f.meaning}</div>
+        </div>
+      `).join('');
+
+      /* 儲存本次結果到 localStorage */
+      const today = new Date();
+      const dateStr = today.getFullYear() + '/' + (today.getMonth()+1) + '/' + today.getDate();
+      const moodRecord = {
+        date: dateStr,
+        flower: r.name,
+        flowerImg: r.img,
+        score: total,
+        tag: r.tag,
+      };
+      const key = 'fl_mood_' + currentUser;
+      const records = JSON.parse(localStorage.getItem(key) || '[]');
+      records.push(moodRecord);
+      localStorage.setItem(key, JSON.stringify(records));
+
+      /* ── 花幣獎勵 ── */
+      Coins.rewardMood(currentUser);
+
+      /* 切換畫面 */
+      document.getElementById('quiz-wrap').style.display = 'none';
+      document.getElementById('result-wrap').style.display = 'block';
+      document.getElementById('step-1').className = 'step done';
+      document.getElementById('step-2').className = 'step active';
+    }
+
+    /* ── 重新測驗 ── */
+    function restart() {
+      currentQ = 0;
+      answers  = [];
+      selected = null;
+      document.getElementById('quiz-wrap').style.display = 'block';
+      document.getElementById('result-wrap').style.display = 'none';
+      document.getElementById('step-1').className = 'step active';
+      document.getElementById('step-2').className = 'step';
+      document.getElementById('step-3').className = 'step';
+      renderQ();
+    }
+
+    /* ── 登出 ── */
+    function logout() {
+      if (confirm('確定要登出嗎？')) {
+        localStorage.removeItem('fl_current');
+        window.location.href = 'index.html';
+      }
+    }
+
+    /* ── 初始化 ── */
+    renderQ();
+  </script>
+
+</body>
+</html>

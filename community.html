@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>花語社群 · 花語心情</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500&family=Noto+Sans+TC:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Noto Sans TC', sans-serif; background: #f7f0f5; min-height: 100vh; color: #4a2040; }
+
+    nav {
+      background: #fff;
+      border-bottom: 0.5px solid #e8d5e5;
+      padding: 0 2rem;
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-logo { font-family: 'Noto Serif TC', serif; font-size: 17px; font-weight: 500; color: #4a2040; text-decoration: none; }
+    .nav-links { display: flex; gap: 4px; list-style: none; }
+    .nav-links a { font-size: 14px; color: #9a7090; text-decoration: none; padding: 7px 12px; border-radius: 10px; transition: background 0.15s; }
+    .nav-links a:hover, .nav-links a.active { background: #f5edf3; color: #4a2040; }
+    .nav-right { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+    .nav-coins-badge { display: flex; align-items: center; gap: 5px; background: #fff8e8; border: 0.5px solid #f0d898; border-radius: 20px; padding: 5px 12px; font-size: 13px; font-weight: 500; color: #a07020; }
+    .btn-logout { font-size: 12px; color: #b090a8; background: none; border: 0.5px solid #e0cedd; border-radius: 8px; padding: 5px 10px; cursor: pointer; font-family: 'Noto Sans TC', sans-serif; }
+    .btn-logout:hover { background: #f5edf3; }
+
+    main { max-width: 680px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+    /* ── 發布區 ── */
+    .post-card {
+      background: #fff;
+      border-radius: 20px;
+      border: 0.5px solid #e8d5e5;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .post-card h2 { font-family: 'Noto Serif TC', serif; font-size: 16px; font-weight: 500; color: #4a2040; margin-bottom: 1rem; }
+
+    .flower-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1rem; }
+    .fl-chip { padding: 6px 12px; border-radius: 20px; border: 0.5px solid #e0cedd; background: #fff; font-size: 12px; color: #7a5070; cursor: pointer; font-family: 'Noto Sans TC', sans-serif; transition: all 0.15s; }
+    .fl-chip:hover { background: #fdf0f8; }
+    .fl-chip.active { background: #fdf0f8; border-color: #b05a8a; color: #b05a8a; font-weight: 500; }
+
+    .post-textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 12px 14px;
+      border: 0.5px solid #e0cedd;
+      border-radius: 12px;
+      font-size: 14px;
+      font-family: 'Noto Sans TC', sans-serif;
+      color: #4a2040;
+      background: #fdf8fc;
+      outline: none;
+      resize: none;
+      line-height: 1.8;
+      margin-bottom: 1rem;
+    }
+    .post-textarea:focus { border-color: #b05a8a; background: #fff; }
+    .post-textarea::placeholder { color: #c0a0b8; }
+
+    .post-bottom { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .anon-toggle { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #7a5070; cursor: pointer; }
+    .anon-toggle input[type="checkbox"] { width: 16px; height: 16px; accent-color: #b05a8a; cursor: pointer; }
+
+    .btn-post { padding: 10px 24px; background: #b05a8a; color: #fff; border: none; border-radius: 20px; font-size: 14px; font-weight: 500; font-family: 'Noto Sans TC', sans-serif; cursor: pointer; transition: background 0.15s; }
+    .btn-post:hover { background: #9a4878; }
+
+    /* ── 篩選 ── */
+    .filter-row { display: flex; gap: 6px; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .filter-chip { padding: 6px 14px; border-radius: 20px; border: 0.5px solid #e0cedd; background: #fff; font-size: 12px; color: #7a5070; cursor: pointer; font-family: 'Noto Sans TC', sans-serif; transition: all 0.15s; }
+    .filter-chip:hover { background: #f5edf3; }
+    .filter-chip.active { background: #b05a8a; color: #fff; border-color: #b05a8a; }
+
+    /* ── 貼文卡片 ── */
+    .post-item {
+      background: #fff;
+      border-radius: 18px;
+      border: 0.5px solid #e8d5e5;
+      padding: 1.25rem 1.25rem 1rem;
+      margin-bottom: 12px;
+      transition: border-color 0.15s;
+    }
+    .post-item:hover { border-color: #c07098; }
+
+    .post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .post-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #fdf0f8;
+      border: 0.5px solid #e0cedd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .post-meta { flex: 1; }
+    .post-author { font-size: 14px; font-weight: 500; color: #4a2040; }
+    .post-author .user-title { font-size: 11px; color: #b05a8a; margin-left: 6px; }
+    .post-date { font-size: 11px; color: #b090a8; margin-top: 1px; }
+    .post-flower-badge { font-size: 20px; }
+
+    .post-body { font-size: 14px; color: #4a2040; line-height: 1.9; margin-bottom: 10px; }
+
+    /* 花卉照片 */
+    .post-flower-img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 12px;
+      display: block;
+      margin-bottom: 10px;
+      background: #f5edf3;
+    }
+
+    .post-footer { display: flex; align-items: center; gap: 12px; }
+    .post-tag { font-size: 11px; padding: 3px 10px; border-radius: 10px; background: #fdf0f8; color: #b05a8a; }
+    .post-anon { font-size: 11px; padding: 3px 10px; border-radius: 10px; background: #f5edf3; color: #7a9070; }
+    .btn-react { background: none; border: 0.5px solid #e0cedd; border-radius: 20px; padding: 4px 12px; font-size: 12px; color: #7a5070; cursor: pointer; font-family: 'Noto Sans TC', sans-serif; transition: all 0.15s; margin-left: auto; }
+    .btn-react:hover { background: #fdf0f8; border-color: #c07098; }
+    .btn-react.liked { background: #fdf0f8; border-color: #b05a8a; color: #b05a8a; }
+    .btn-delete-post { background: none; border: none; color: #d0a0b8; font-size: 13px; cursor: pointer; padding: 4px 8px; border-radius: 8px; font-family: 'Noto Sans TC', sans-serif; transition: all 0.15s; }
+    .btn-delete-post:hover { background: #fdf0f8; color: #c04878; }
+
+    /* 空狀態 */
+    .empty { text-align: center; padding: 3rem 0; color: #b090a8; font-size: 14px; line-height: 2; }
+    .empty-icon { font-size: 40px; display: block; margin-bottom: 8px; }
+
+    /* Toast */
+    .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(20px); background: #4a2040; color: #fff; padding: 10px 20px; border-radius: 24px; font-size: 14px; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 999; white-space: nowrap; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 500px) {
+      nav { padding: 0 1rem; }
+      .nav-links { display: none; }
+      main { padding: 1.25rem 1rem 4rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a class="nav-logo" href="home.html">🌸 花語心情</a>
+    <ul class="nav-links">
+      <li><a href="home.html">首頁</a></li>
+      <li><a href="encyclopedia.html">花語圖鑑</a></li>
+      <li><a href="mood.html">心情量表</a></li>
+      <li><a href="diary.html">心情日記</a></li>
+      <li><a href="community.html" class="active">社群</a></li>
+      <li><a href="shop.html">商店</a></li>
+    </ul>
+    <div class="nav-right">
+      <div class="nav-coins-badge">🪙 <span id="nav-coins">0</span></div>
+      <span id="nav-username"></span>
+      <button class="btn-logout" onclick="logout()">登出</button>
+    </div>
+  </nav>
+
+  <main>
+
+    <!-- 發布區 -->
+    <div class="post-card">
+      <h2>✏️ 分享今天的花語心情</h2>
+      <div class="flower-row" id="post-flower-row">
+        <div class="fl-chip active" data-icon="🌹" data-name="玫瑰" data-img="assets/images/rose.jpg" onclick="pickPostFlower(this)">🌹 玫瑰</div>
+        <div class="fl-chip" data-icon="🌷" data-name="鬱金香" data-img="assets/images/tulip.jpg" onclick="pickPostFlower(this)">🌷 鬱金香</div>
+        <div class="fl-chip" data-icon="🌸" data-name="櫻花" data-img="assets/images/cherry-blossom.jpg" onclick="pickPostFlower(this)">🌸 櫻花</div>
+        <div class="fl-chip" data-icon="🌻" data-name="向日葵" data-img="assets/images/sunflower.jpg" onclick="pickPostFlower(this)">🌻 向日葵</div>
+        <div class="fl-chip" data-icon="💐" data-name="薰衣草" data-img="assets/images/lavender.jpg" onclick="pickPostFlower(this)">💐 薰衣草</div>
+        <div class="fl-chip" data-icon="🌺" data-name="牡丹" data-img="assets/images/peony.jpg" onclick="pickPostFlower(this)">🌺 牡丹</div>
+      </div>
+      <textarea class="post-textarea" id="post-content" placeholder="今天的花語心情是...&#10;&#10;可以寫下你今天的感受、想法，或想對大家說的話。" maxlength="200"></textarea>
+      <div class="post-bottom">
+        <label class="anon-toggle">
+          <input type="checkbox" id="anon-check" />
+          匿名發布
+        </label>
+        <button class="btn-post" onclick="submitPost()">發布 🌸</button>
+      </div>
+    </div>
+
+    <!-- 篩選 -->
+    <div class="filter-row">
+      <button class="filter-chip active" onclick="setFilter(this,'')">全部</button>
+      <button class="filter-chip" onclick="setFilter(this,'玫瑰')">🌹 玫瑰</button>
+      <button class="filter-chip" onclick="setFilter(this,'鬱金香')">🌷 鬱金香</button>
+      <button class="filter-chip" onclick="setFilter(this,'櫻花')">🌸 櫻花</button>
+      <button class="filter-chip" onclick="setFilter(this,'向日葵')">🌻 向日葵</button>
+      <button class="filter-chip" onclick="setFilter(this,'薰衣草')">💐 薰衣草</button>
+    </div>
+
+    <!-- 貼文列表 -->
+    <div id="post-list"></div>
+
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="coins.js"></script>
+  <script>
+    /* ── 登入驗證 ── */
+    const currentUser = localStorage.getItem('fl_current');
+    if (!currentUser) window.location.href = 'index.html';
+    document.getElementById('nav-username').textContent = currentUser;
+    Coins.initNav(currentUser);
+
+    const POST_KEY = 'fl_community_posts';
+    let selectedPostFlower = { icon: '🌹', name: '玫瑰', img: 'assets/images/rose.jpg' };
+    let currentFilter = '';
+
+    /* ── 取得稱號 ── */
+    function getUserTitle(user) {
+      const equippedId = Inventory.getEquipped(user, 'title');
+      if (!equippedId) return '';
+      const titles = {
+        title_beginner: '花語初心者', title_writer: '日記達人',
+        title_master: '花語大師',    title_legend: '花園傳說',
+        title_healer: '心靈療癒師',  title_sunshine: '陽光少女',
+      };
+      return titles[equippedId] || '';
+    }
+
+    /* ── 選擇花朵 ── */
+    function pickPostFlower(el) {
+      document.querySelectorAll('#post-flower-row .fl-chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      selectedPostFlower = { icon: el.dataset.icon, name: el.dataset.name, img: el.dataset.img };
+    }
+
+    /* ── 發布貼文 ── */
+    function submitPost() {
+      const content = document.getElementById('post-content').value.trim();
+      if (!content) { showToast('請寫下你的心情！'); return; }
+
+      const isAnon = document.getElementById('anon-check').checked;
+      const title  = getUserTitle(currentUser);
+      const now    = new Date();
+
+      const post = {
+        id:         Date.now(),
+        author:     isAnon ? '匿名花友' : currentUser,
+        originalAuthor: currentUser,
+        isAnon,
+        title,
+        flower:     selectedPostFlower.icon,
+        flowerName: selectedPostFlower.name,
+        flowerImg:  selectedPostFlower.img,
+        content,
+        date:       now.getFullYear() + '/' + (now.getMonth()+1) + '/' + now.getDate(),
+        time:       now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0'),
+        likes:      0,
+        likedBy:    [],
+      };
+
+      const posts = getPosts();
+      posts.unshift(post);
+      savePosts(posts);
+
+      document.getElementById('post-content').value = '';
+      document.getElementById('anon-check').checked = false;
+      showToast('發布成功！🌸');
+      renderPosts();
+    }
+
+    /* ── 篩選 ── */
+    function setFilter(el, flower) {
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      currentFilter = flower;
+      renderPosts();
+    }
+
+    /* ── 按讚 ── */
+    function toggleLike(postId) {
+      const posts = getPosts();
+      const post  = posts.find(p => p.id === postId);
+      if (!post) return;
+
+      if (!post.likedBy) post.likedBy = [];
+      const idx = post.likedBy.indexOf(currentUser);
+      if (idx === -1) {
+        post.likedBy.push(currentUser);
+        post.likes = (post.likes || 0) + 1;
+      } else {
+        post.likedBy.splice(idx, 1);
+        post.likes = Math.max(0, (post.likes || 1) - 1);
+      }
+      savePosts(posts);
+      renderPosts();
+    }
+
+    /* ── 渲染貼文 ── */
+    function renderPosts() {
+      const posts   = getPosts();
+      const filtered = currentFilter
+        ? posts.filter(p => p.flowerName === currentFilter)
+        : posts;
+      const container = document.getElementById('post-list');
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="empty">
+            <span class="empty-icon">🌿</span>
+            還沒有任何貼文<br>
+            成為第一個分享花語心情的人吧！
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(p => {
+        const liked = (p.likedBy || []).includes(currentUser);
+        /* 判斷是否為自己的貼文：實名 = author 符合，匿名 = originalAuthor 符合 */
+        const isOwner = p.originalAuthor === currentUser;
+        return `
+          <div class="post-item">
+            <div class="post-header">
+              <div class="post-avatar">${p.isAnon ? '🌿' : p.flower}</div>
+              <div class="post-meta">
+                <div class="post-author">
+                  ${escHtml(p.author)}
+                  ${p.title && !p.isAnon ? `<span class="user-title">「${p.title}」</span>` : ''}
+                </div>
+                <div class="post-date">${p.date} ${p.time}</div>
+              </div>
+              <div class="post-flower-badge">${p.flower}</div>
+            </div>
+            <img class="post-flower-img" src="${p.flowerImg}" alt="${p.flowerName}" loading="lazy" />
+            <div class="post-body">${escHtml(p.content)}</div>
+            <div class="post-footer">
+              <span class="post-tag">${p.flowerName}</span>
+              ${p.isAnon ? '<span class="post-anon">匿名</span>' : ''}
+              <button class="btn-react ${liked ? 'liked' : ''}" onclick="toggleLike(${p.id})">
+                🌸 ${p.likes || 0}
+              </button>
+              ${isOwner ? `<button class="btn-delete-post" onclick="deletePost(${p.id})" title="刪除這篇貼文">× 刪除</button>` : ''}
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    /* ── 刪除貼文 ── */
+    function deletePost(postId) {
+      if (!confirm('確定要刪除這篇貼文嗎？')) return;
+      const posts = getPosts().filter(p => p.id !== postId);
+      savePosts(posts);
+      showToast('貼文已刪除');
+      renderPosts();
+    }
+
+    /* ── localStorage 工具 ── */
+    function getPosts() {
+      return JSON.parse(localStorage.getItem(POST_KEY) || '[]');
+    }
+    function savePosts(list) {
+      localStorage.setItem(POST_KEY, JSON.stringify(list));
+    }
+    function escHtml(str) {
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    /* ── Toast ── */
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 2200);
+    }
+
+    /* ── 登出 ── */
+    function logout() {
+      if (confirm('確定要登出嗎？')) {
+        localStorage.removeItem('fl_current');
+        window.location.href = 'index.html';
+      }
+    }
+
+    /* ── 預設示範貼文（第一次開啟時）── */
+    function seedDemoPosts() {
+      const existing = getPosts();
+      if (existing.length > 0) return;
+      const demos = [
+        { id: 1, author: '匿名花友', isAnon: true, title: '', flower: '🌸', flowerName: '櫻花', flowerImg: 'assets/images/cherry-blossom.jpg', content: '今天心情有點複雜，看到路邊的花覺得世界還是很美好。', date: '2026/6/10', time: '14:32', likes: 5, likedBy: [] },
+        { id: 2, author: 'flower_girl', isAnon: false, title: '花語初心者', flower: '🌻', flowerName: '向日葵', flowerImg: 'assets/images/sunflower.jpg', content: '今天完成了期末報告，感覺整個人都亮起來了！就像向日葵一樣充滿能量 ☀️', date: '2026/6/10', time: '10:15', likes: 12, likedBy: [] },
+        { id: 3, author: '匿名花友', isAnon: true, title: '', flower: '💐', flowerName: '薰衣草', flowerImg: 'assets/images/lavender.jpg', content: '最近壓力很大，聞到薰衣草的香味感覺平靜了一點。希望明天會更好。', date: '2026/6/9', time: '22:08', likes: 8, likedBy: [] },
+      ];
+      savePosts(demos);
+    }
+
+    /* ── 初始化 ── */
+    seedDemoPosts();
+    renderPosts();
+  </script>
+
+</body>
+</html>

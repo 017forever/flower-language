@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>花語圖鑑 · 花語心情</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500&family=Noto+Sans+TC:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      background: #f7f0f5;
+      min-height: 100vh;
+      color: #4a2040;
+    }
+
+    /* ── 導覽列 ── */
+    nav {
+      background: #ffffff;
+      border-bottom: 0.5px solid #e8d5e5;
+      padding: 0 2rem;
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-logo {
+      font-family: 'Noto Serif TC', serif;
+      font-size: 17px;
+      font-weight: 500;
+      color: #4a2040;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+    .nav-links {
+      display: flex;
+      gap: 4px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 14px;
+      color: #9a7090;
+      text-decoration: none;
+      padding: 7px 12px;
+      border-radius: 10px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .nav-links a:hover,
+    .nav-links a.active {
+      background: #f5edf3;
+      color: #4a2040;
+    }
+    .nav-user {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #7a5070;
+    }
+    .btn-logout {
+      font-size: 12px;
+      color: #b090a8;
+      background: none;
+      border: 0.5px solid #e0cedd;
+      border-radius: 8px;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-family: 'Noto Sans TC', sans-serif;
+      transition: background 0.15s;
+    }
+    .btn-logout:hover { background: #f5edf3; color: #9a4878; }
+    .nav-coins-badge { display:flex; align-items:center; gap:5px; background:#fff8e8; border:0.5px solid #f0d898; border-radius:20px; padding:5px 12px; font-size:13px; font-weight:500; color:#a07020; }
+
+    /* ── 主內容 ── */
+    main {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    /* ── 頁首 ── */
+    .page-header { margin-bottom: 1.5rem; }
+    .page-header h1 {
+      font-family: 'Noto Serif TC', serif;
+      font-size: 22px;
+      font-weight: 500;
+      color: #4a2040;
+      margin-bottom: 4px;
+    }
+    .page-header p { font-size: 14px; color: #9a7090; }
+
+    /* ── 搜尋欄 ── */
+    .search-bar {
+      width: 100%;
+      padding: 11px 16px;
+      border: 0.5px solid #ddc8d8;
+      border-radius: 14px;
+      font-size: 14px;
+      font-family: 'Noto Sans TC', sans-serif;
+      background: #ffffff;
+      color: #4a2040;
+      outline: none;
+      margin-bottom: 1rem;
+      transition: border-color 0.15s;
+    }
+    .search-bar:focus { border-color: #b05a8a; }
+    .search-bar::placeholder { color: #c0a0b8; }
+
+    /* ── 分類標籤 ── */
+    .tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+    .tag {
+      font-size: 12px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 0.5px solid #e0cedd;
+      background: #ffffff;
+      color: #7a5070;
+      cursor: pointer;
+      font-family: 'Noto Sans TC', sans-serif;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .tag:hover  { background: #f5edf3; }
+    .tag.active { background: #b05a8a; color: #ffffff; border-color: #b05a8a; }
+
+    /* ── 花卉卡片格 ── */
+    .flower-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .flower-card {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 0.5px solid #e8d5e5;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+    .flower-card:hover {
+      border-color: #b05a8a;
+      transform: translateY(-2px);
+    }
+    .flower-card img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      display: block;
+      background: #f5edf3;
+    }
+    .flower-card-body { padding: 12px 12px 14px; }
+    .flower-name {
+      font-size: 15px;
+      font-weight: 500;
+      color: #4a2040;
+      margin-bottom: 2px;
+    }
+    .flower-latin {
+      font-size: 11px;
+      color: #b090a8;
+      font-style: italic;
+      margin-bottom: 8px;
+    }
+    .flower-meaning {
+      font-size: 12px;
+      color: #7a5070;
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+    .flower-tag-badge {
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 10px;
+      background: #fdf0f8;
+      color: #b05a8a;
+      display: inline-block;
+    }
+
+    /* ── 彈窗詳情 ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(74, 32, 64, 0.35);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: #ffffff;
+      border-radius: 24px;
+      width: 100%;
+      max-width: 400px;
+      overflow: hidden;
+    }
+    .modal img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      display: block;
+    }
+    .modal-body { padding: 1.5rem; }
+    .modal-name {
+      font-family: 'Noto Serif TC', serif;
+      font-size: 20px;
+      font-weight: 500;
+      color: #4a2040;
+      margin-bottom: 2px;
+    }
+    .modal-latin {
+      font-size: 13px;
+      color: #b090a8;
+      font-style: italic;
+      margin-bottom: 1rem;
+    }
+    .modal-section-title {
+      font-size: 12px;
+      font-weight: 500;
+      color: #b05a8a;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+    .modal-text {
+      font-size: 14px;
+      color: #4a2040;
+      line-height: 1.9;
+      margin-bottom: 1rem;
+    }
+    .modal-close {
+      width: 100%;
+      padding: 10px;
+      background: #f5edf3;
+      color: #7a5070;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      font-family: 'Noto Sans TC', sans-serif;
+      cursor: pointer;
+      margin-top: 0.25rem;
+    }
+    .modal-close:hover { background: #eddde8; }
+
+    /* ── 無結果 ── */
+    .empty {
+      text-align: center;
+      padding: 3rem 0;
+      color: #b090a8;
+      font-size: 14px;
+      line-height: 2;
+      grid-column: 1 / -1;
+    }
+
+    /* ── 手機響應式 ── */
+    @media (max-width: 560px) {
+      nav { padding: 0 1rem; }
+      .nav-links { display: none; }
+      main { padding: 1.25rem 1rem 4rem; }
+      .flower-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 360px) {
+      .flower-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 導覽列 -->
+  <nav>
+    <a class="nav-logo" href="home.html">🌸 花語心情</a>
+    <ul class="nav-links">
+      <li><a href="home.html">首頁</a></li>
+      <li><a href="encyclopedia.html" class="active">花語圖鑑</a></li>
+      <li><a href="mood.html">心情量表</a></li>
+      <li><a href="diary.html">心情日記</a></li>
+      <li><a href="community.html">社群</a></li>
+      <li><a href="shop.html">商店</a></li>
+    </ul>
+    <div class="nav-user">
+      <div class="nav-coins-badge">🪙 <span id="nav-coins">0</span></div>
+      <span id="nav-username">使用者</span>
+      <button class="btn-logout" onclick="logout()">登出</button>
+    </div>
+  </nav>
+
+  <!-- 主內容 -->
+  <main>
+    <div class="page-header">
+      <h1>花語圖鑑</h1>
+      <p>探索花卉的語言，找到屬於你心情的那朵花</p>
+    </div>
+
+    <input class="search-bar" id="search-input" placeholder="搜尋花名、花語..." oninput="filterFlowers()" />
+
+    <div class="tags" id="tag-bar">
+      <button class="tag active" onclick="setTag(this, '')">全部</button>
+      <button class="tag" onclick="setTag(this, '愛情')">愛情</button>
+      <button class="tag" onclick="setTag(this, '療癒')">療癒</button>
+      <button class="tag" onclick="setTag(this, '勇氣')">勇氣</button>
+      <button class="tag" onclick="setTag(this, '純真')">純真</button>
+      <button class="tag" onclick="setTag(this, '思念')">思念</button>
+      <button class="tag" onclick="setTag(this, '友誼')">友誼</button>
+      <button class="tag" onclick="setTag(this, '希望')">希望</button>
+    </div>
+
+    <div class="flower-grid" id="flower-grid"></div>
+  </main>
+
+  <!-- 詳情彈窗 -->
+  <div class="modal-overlay" id="modal" onclick="closeModal(event)">
+    <div class="modal" id="modal-box">
+      <img id="modal-img" src="" alt="" />
+      <div class="modal-body">
+        <div class="modal-name" id="modal-name"></div>
+        <div class="modal-latin" id="modal-latin"></div>
+        <div class="modal-section-title">花語意義</div>
+        <div class="modal-text" id="modal-meaning"></div>
+        <div class="modal-section-title">花語故事</div>
+        <div class="modal-text" id="modal-story"></div>
+        <button class="modal-close" onclick="document.getElementById('modal').classList.remove('open')">關閉</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="coins.js"></script>
+  <script>
+    /* ── 登入驗證 ── */
+    const currentUser = localStorage.getItem('fl_current');
+    if (!currentUser) window.location.href = 'index.html';
+    document.getElementById('nav-username').textContent = currentUser;
+    Coins.initNav(currentUser);
+
+    /* ── 花卉資料庫（20 種）── */
+    const flowers = [
+      {
+        name: '玫瑰', latin: 'Rosa', tag: '愛情',
+        meaning: '熱烈的愛與勇氣，代表深刻的情感表達',
+        story: '玫瑰自古以來是愛情的象徵。在希臘神話中，玫瑰是愛神阿芙蘿黛蒂的聖花，紅玫瑰代表熱情的愛，粉玫瑰代表感謝與欣賞，白玫瑰則象徵純潔的心意。',
+        img: 'assets/images/rose.jpg'
+      },
+      {
+        name: '鬱金香', latin: 'Tulipa', tag: '愛情',
+        meaning: '溫柔的告白，代表完美與深情的愛',
+        story: '鬱金香起源於中亞，在荷蘭形成了著名的「鬱金香狂熱」。在土耳其文化中，鬱金香是天堂的象徵，也代表深沉而無法言喻的愛意。',
+        img: 'assets/images/tulip.jpg'
+      },
+      {
+        name: '向日葵', latin: 'Helianthus annuus', tag: '勇氣',
+        meaning: '追求光明與希望，代表忠誠與積極向上的精神',
+        story: '向日葵因追著太陽轉動而得名。在希臘神話中，水澤女神克莉緹愛上了太陽神阿波羅，每天凝視著他的身影，最終化為向日葵，象徵無悔的追求與忠誠。',
+        img: 'assets/images/sunflower.jpg'
+      },
+      {
+        name: '薰衣草', latin: 'Lavandula', tag: '療癒',
+        meaning: '寧靜與心靈療癒，代表優雅與安定的力量',
+        story: '薰衣草的名字源自拉丁文「lavare」（洗滌），古羅馬人用它來淨化浴池與空氣。它的香氣能舒緩神經、帶來平靜，自古被視為療癒與愛情的守護植物。',
+        img: 'assets/images/lavender.jpg'
+      },
+      {
+        name: '雛菊', latin: 'Bellis perennis', tag: '純真',
+        meaning: '純真與新的開始，代表天真無邪的心靈',
+        story: '雛菊是維多利亞時代最常用來傳遞秘密訊息的花朵。人們用「他愛我，他不愛我」的方式拔取花瓣占卜愛情，象徵純粹而直接的情感表達。',
+        img: 'assets/images/daisy.jpg'
+      },
+      {
+        name: '櫻花', latin: 'Prunus serrulata', tag: '思念',
+        meaning: '生命短暫而美麗，代表珍惜當下與對逝去美好的思念',
+        story: '在日本，賞櫻（花見）是重要的文化儀式。櫻花只盛開一週，象徵武士道精神中對短暫生命的坦然接受，也代表對美好事物最深的珍惜與思念。',
+        img: 'assets/images/cherry-blossom.jpg'
+      },
+      {
+        name: '百合', latin: 'Lilium', tag: '純真',
+        meaning: '純潔與莊重，代表心靈的高尚與神聖的祝福',
+        story: '百合在基督教文化中象徵聖母瑪利亞的純潔，在中國則代表百年好合、婚姻美滿。白百合的潔白花瓣與清雅香氣，使它成為純淨心靈的最佳象徵。',
+        img: 'assets/images/lily.jpg'
+      },
+      {
+        name: '滿天星', latin: 'Gypsophila', tag: '友誼',
+        meaning: '永恆的愛與真摯的友誼，代表細膩而長久的情感',
+        story: '滿天星雖然小巧，卻以數量繁多的白色小花串聯成一片星海。它常作為花束的陪襯，卻在細膩之處展現出不可或缺的存在感，象徵細水長流的真誠友情。',
+        img: 'assets/images/gypsophila.jpg'
+      },
+      {
+        name: '牡丹', latin: 'Paeonia suffruticosa', tag: '勇氣',
+        meaning: '富貴與繁榮，代表勇於展現自我的大器之美',
+        story: '牡丹被譽為「百花之王」，在中國唐朝達到崇拜頂峰。武則天曾命百花在冬天盛開，只有牡丹不服從，被貶至洛陽，卻在那裡更加茂盛，象徵不屈的勇氣。',
+        img: 'assets/images/peony.jpg'
+      },
+      {
+        name: '繡球花', latin: 'Hydrangea', tag: '療癒',
+        meaning: '豐盛與感謝，代表包容與溫柔的關懷',
+        story: '繡球花的花色會隨土壤酸鹼值改變，象徵多變卻豐富的情感。在日本，繡球花與梅雨季節緊密相連，其溫柔的紫藍色調常令人感到撫慰與平靜。',
+        img: 'assets/images/hydrangea.jpg'
+      },
+      {
+        name: '非洲菊', latin: 'Gerbera', tag: '希望',
+        meaning: '充滿活力與希望，代表樂觀開朗的生命力',
+        story: '非洲菊以鮮豔多彩的花色著稱，是世界上最受歡迎的切花之一。其圓潤飽滿的花形如同太陽，象徵充沛的能量與對明天永不放棄的希望。',
+        img: 'assets/images/gerbera.jpg'
+      },
+      {
+        name: '茉莉', latin: 'Jasminum', tag: '愛情',
+        meaning: '優雅的愛慕與深情，代表細緻而持久的情感',
+        story: '茉莉花香飄散千里，在東南亞文化中是婚禮與愛情的聖花。在印度，茉莉花環是獻給神明的供品，也是戀人間最深情的禮物，象徵純粹而持久的愛慕之情。',
+        img: 'assets/images/jasmine.jpg'
+      },
+      {
+        name: '蒲公英', latin: 'Taraxacum', tag: '希望',
+        meaning: '自由與願望成真，代表勇敢放手的勇氣',
+        story: '蒲公英的種子隨風飄散至遠方，每一粒種子都帶著飛向未知的勇氣。許多文化中，對著蒲公英吹氣許願，象徵將心願送向宇宙，相信夢想終將落地生根。',
+        img: 'assets/images/dandelion.jpg'
+      },
+      {
+        name: '波斯菊', latin: 'Cosmos', tag: '純真',
+        meaning: '少女的純真與清純之美，代表天真爛漫的心',
+        story: '波斯菊花形輕盈，在微風中搖曳生姿，象徵少女般純真無邪的心靈。在日本秋季花田中，大片波斯菊構成浪漫畫面，也代表對美好時光的珍惜。',
+        img: 'assets/images/cosmos.jpg'
+      },
+      {
+        name: '梔子花', latin: 'Gardenia', tag: '思念',
+        meaning: '永恆的愛與深切的思念，代表你是我心中唯一',
+        story: '梔子花潔白如玉，香氣濃郁而持久，在中國傳統中象徵對遠行之人的深切思念。其花語「永恆的愛」來自它花開不改色、香氣不散的特質，如同心中不變的情感。',
+        img: 'assets/images/gardenia.jpg'
+      },
+      {
+        name: '桔梗', latin: 'Platycodon', tag: '友誼',
+        meaning: '永恆的愛與不變的友情，代表誠實與深厚的羈絆',
+        story: '桔梗是朝鮮半島的國花，代表忠誠與純粹的感情。韓國民謠《桔梗謠》中，採摘桔梗的歌聲象徵對故鄉與舊友的深切懷念，是友情與羈絆的美麗詩篇。',
+        img: 'assets/images/platycodon.jpg'
+      },
+      {
+        name: '睡蓮', latin: 'Nymphaea', tag: '療癒',
+        meaning: '清淨心靈與覺醒，代表在困境中保持美麗的力量',
+        story: '睡蓮生於泥水之中卻潔淨盛開，是佛教聖花，象徵在塵世煩惱中保持內心清靜的智慧。莫內的名畫《睡蓮》系列，捕捉了它在光影中令人靜心的療癒之美。',
+        img: 'assets/images/water-lily.jpg'
+      },
+      {
+        name: '鳶尾花', latin: 'Iris', tag: '希望',
+        meaning: '好消息與希望的訊息，代表智慧與勇氣',
+        story: '鳶尾花以希臘彩虹女神 Iris 命名，她是神與人之間的使者。法國王室以鳶尾花作為皇室紋章，梵谷的名畫《鳶尾花》則展現了它充滿生命力的希望之姿。',
+        img: 'assets/images/iris.jpg'
+      },
+      {
+        name: '木蘭花', latin: 'Magnolia', tag: '勇氣',
+        meaning: '高貴的靈魂與堅韌之美，代表面對逆境的優雅',
+        story: '木蘭花在寒冬末期、百花未開之前率先盛開，象徵不畏艱難、勇於先行的精神。在中國文學中，木蘭更因「花木蘭」的傳說而成為女性勇氣與智慧的象徵。',
+        img: 'assets/images/magnolia.jpg'
+      },
+      {
+        name: '勿忘我', latin: 'Myosotis', tag: '思念',
+        meaning: '真摯的思念與永不忘懷，代表請記住我的心願',
+        story: '德國傳說中，騎士為心愛的人採摘這朵藍花，卻不慎落入河中，臨終前將花拋給愛人並喊道「Vergiss mein nicht（勿忘我）」，從此這朵花承載了最深的思念。',
+        img: 'assets/images/forget-me-not.jpg'
+      },
+    ];
+
+    let currentTag = '';
+
+    /* ── 渲染卡片 ── */
+    function renderFlowers(list) {
+      const grid = document.getElementById('flower-grid');
+      if (list.length === 0) {
+        grid.innerHTML = '<div class="empty">找不到符合的花朵<br>試試其他關鍵字吧 🌿</div>';
+        return;
+      }
+      grid.innerHTML = list.map((f, i) => `
+        <div class="flower-card" onclick="openModal(${flowers.indexOf(f)})">
+          <img src="${f.img}" alt="${f.name}" loading="lazy" />
+          <div class="flower-card-body">
+            <div class="flower-name">${f.name}</div>
+            <div class="flower-latin">${f.latin}</div>
+            <div class="flower-meaning">${f.meaning}</div>
+            <span class="flower-tag-badge">${f.tag}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    /* ── 篩選 ── */
+    function filterFlowers() {
+      const q = document.getElementById('search-input').value.toLowerCase();
+      const result = flowers.filter(f =>
+        (currentTag === '' || f.tag === currentTag) &&
+        (f.name.includes(q) || f.meaning.includes(q) || f.latin.toLowerCase().includes(q))
+      );
+      renderFlowers(result);
+    }
+
+    function setTag(el, tag) {
+      document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      currentTag = tag;
+      filterFlowers();
+    }
+
+    /* ── 彈窗 ── */
+    function openModal(index) {
+      const f = flowers[index];
+      document.getElementById('modal-img').src = f.img;
+      document.getElementById('modal-img').alt = f.name;
+      document.getElementById('modal-name').textContent = f.name;
+      document.getElementById('modal-latin').textContent = f.latin + '　·　' + f.tag;
+      document.getElementById('modal-meaning').textContent = f.meaning;
+      document.getElementById('modal-story').textContent = f.story;
+      document.getElementById('modal').classList.add('open');
+    }
+
+    function closeModal(e) {
+      if (e.target === document.getElementById('modal')) {
+        document.getElementById('modal').classList.remove('open');
+      }
+    }
+
+    /* ── 登出 ── */
+    function logout() {
+      if (confirm('確定要登出嗎？')) {
+        localStorage.removeItem('fl_current');
+        window.location.href = 'index.html';
+      }
+    }
+
+    /* ── 初始化 ── */
+    renderFlowers(flowers);
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>心情日記 · 花語心情</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500&family=Noto+Sans+TC:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      background: #f7f0f5;
+      min-height: 100vh;
+      color: #4a2040;
+    }
+
+    /* ── 導覽列 ── */
+    nav {
+      background: #ffffff;
+      border-bottom: 0.5px solid #e8d5e5;
+      padding: 0 2rem;
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-logo {
+      font-family: 'Noto Serif TC', serif;
+      font-size: 17px;
+      font-weight: 500;
+      color: #4a2040;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .nav-links {
+      display: flex;
+      gap: 4px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 14px;
+      color: #9a7090;
+      text-decoration: none;
+      padding: 7px 12px;
+      border-radius: 10px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .nav-links a:hover,
+    .nav-links a.active { background: #f5edf3; color: #4a2040; }
+    .nav-user {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #7a5070;
+    }
+    .btn-logout {
+      font-size: 12px;
+      color: #b090a8;
+      background: none;
+      border: 0.5px solid #e0cedd;
+      border-radius: 8px;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-family: 'Noto Sans TC', sans-serif;
+      transition: background 0.15s;
+    }
+    .btn-logout:hover { background: #f5edf3; color: #9a4878; }
+    .nav-coins-badge { display:flex; align-items:center; gap:5px; background:#fff8e8; border:0.5px solid #f0d898; border-radius:20px; padding:5px 12px; font-size:13px; font-weight:500; color:#a07020; }
+
+    /* ── 主內容 ── */
+    main {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    /* ── 分頁標籤 ── */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 1.5rem;
+    }
+    .tab {
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      border: 0.5px solid #e0cedd;
+      background: #ffffff;
+      color: #7a5070;
+      cursor: pointer;
+      font-family: 'Noto Sans TC', sans-serif;
+      transition: all 0.15s;
+    }
+    .tab:hover  { background: #f5edf3; }
+    .tab.active { background: #b05a8a; color: #ffffff; border-color: #b05a8a; }
+
+    /* ══════════════════════════════
+       寫日記區
+    ══════════════════════════════ */
+    .write-card {
+      background: #ffffff;
+      border-radius: 20px;
+      border: 0.5px solid #e8d5e5;
+      padding: 1.75rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .write-date {
+      font-size: 12px;
+      color: #b090a8;
+      margin-bottom: 1.25rem;
+      letter-spacing: 0.04em;
+    }
+
+    /* 花朵選擇 */
+    .section-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: #7a5070;
+      margin-bottom: 10px;
+    }
+    .flower-select {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 1.25rem;
+    }
+    .flower-chip {
+      padding: 7px 14px;
+      border-radius: 20px;
+      border: 0.5px solid #e0cedd;
+      background: #ffffff;
+      font-size: 13px;
+      color: #7a5070;
+      cursor: pointer;
+      font-family: 'Noto Sans TC', sans-serif;
+      transition: all 0.15s;
+    }
+    .flower-chip:hover  { background: #fdf0f8; border-color: #c07098; }
+    .flower-chip.active { background: #fdf0f8; border-color: #b05a8a; color: #b05a8a; font-weight: 500; }
+
+    /* 心情標題輸入 */
+    .mood-input {
+      width: 100%;
+      padding: 10px 0;
+      border: none;
+      border-bottom: 0.5px solid #e0cedd;
+      font-size: 15px;
+      font-family: 'Noto Serif TC', serif;
+      color: #4a2040;
+      background: transparent;
+      outline: none;
+      margin-bottom: 1.25rem;
+      transition: border-color 0.15s;
+    }
+    .mood-input:focus { border-bottom-color: #b05a8a; }
+    .mood-input::placeholder { color: #c0a0b8; font-family: 'Noto Sans TC', sans-serif; font-size: 14px; }
+
+    /* 日記內文 */
+    .content-input {
+      width: 100%;
+      min-height: 160px;
+      padding: 14px;
+      border: 0.5px solid #e0cedd;
+      border-radius: 14px;
+      font-size: 14px;
+      font-family: 'Noto Sans TC', sans-serif;
+      color: #4a2040;
+      background: #fdf8fc;
+      outline: none;
+      resize: vertical;
+      line-height: 1.9;
+      transition: border-color 0.15s;
+    }
+    .content-input:focus { border-color: #b05a8a; background: #ffffff; }
+    .content-input::placeholder { color: #c0a0b8; }
+
+    .char-count {
+      text-align: right;
+      font-size: 11px;
+      color: #c0a0b8;
+      margin-top: 6px;
+      margin-bottom: 1rem;
+    }
+
+    /* 儲存按鈕 */
+    .btn-save {
+      width: 100%;
+      padding: 13px;
+      background: #b05a8a;
+      color: #ffffff;
+      border: none;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 500;
+      font-family: 'Noto Sans TC', sans-serif;
+      cursor: pointer;
+      letter-spacing: 0.06em;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .btn-save:hover  { background: #9a4878; }
+    .btn-save:active { transform: scale(0.98); }
+
+    /* 成功提示 */
+    .save-success {
+      display: none;
+      text-align: center;
+      padding: 1rem;
+      background: #f0fdf5;
+      border: 0.5px solid #b0e8c8;
+      border-radius: 14px;
+      font-size: 14px;
+      color: #2a7a50;
+      margin-top: 1rem;
+    }
+
+    /* ══════════════════════════════
+       日記列表區
+    ══════════════════════════════ */
+    .list-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+    .list-count { font-size: 13px; color: #9a7090; }
+    .btn-clear {
+      font-size: 12px;
+      color: #c090a8;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: 'Noto Sans TC', sans-serif;
+    }
+
+    .diary-item {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 0.5px solid #e8d5e5;
+      padding: 1.1rem 1.25rem;
+      margin-bottom: 10px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .diary-item:hover { border-color: #c07098; }
+
+    .di-date-col {
+      flex-shrink: 0;
+      text-align: center;
+      width: 40px;
+    }
+    .di-day   { font-size: 22px; font-weight: 500; color: #4a2040; line-height: 1; }
+    .di-month { font-size: 11px; color: #b090a8; margin-top: 1px; }
+    .di-flower-icon { font-size: 20px; margin-top: 6px; }
+
+    .di-body  { flex: 1; min-width: 0; }
+    .di-title { font-size: 14px; font-weight: 500; color: #4a2040; margin-bottom: 5px; }
+    .di-preview {
+      font-size: 12px;
+      color: #9a7090;
+      line-height: 1.6;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .di-meta  { display: flex; gap: 8px; align-items: center; margin-top: 7px; }
+    .di-tag   {
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 10px;
+      background: #fdf0f8;
+      color: #b05a8a;
+    }
+    .di-time  { font-size: 11px; color: #c0a0b8; }
+
+    .di-delete {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: none;
+      border: none;
+      color: #d0a0b8;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+      align-self: center;
+    }
+    .di-delete:hover { background: #fdf0f8; color: #c04878; }
+
+    /* 展開詳情 */
+    .di-full {
+      display: none;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 0.5px solid #f0e0ec;
+      font-size: 13px;
+      color: #4a2040;
+      line-height: 1.9;
+      white-space: pre-wrap;
+    }
+    .diary-item.expanded .di-full    { display: block; }
+    .diary-item.expanded .di-preview { display: none; }
+
+    /* 空狀態 */
+    .empty {
+      text-align: center;
+      padding: 3rem 0;
+      color: #b090a8;
+      font-size: 14px;
+      line-height: 2;
+    }
+    .empty-icon { font-size: 40px; display: block; margin-bottom: 8px; }
+
+    /* ══════════════════════════════
+       響應式
+    ══════════════════════════════ */
+    @media (max-width: 500px) {
+      nav { padding: 0 1rem; }
+      .nav-links { display: none; }
+      main { padding: 1.25rem 1rem 4rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a class="nav-logo" href="home.html">🌸 花語心情</a>
+    <ul class="nav-links">
+      <li><a href="home.html">首頁</a></li>
+      <li><a href="encyclopedia.html">花語圖鑑</a></li>
+      <li><a href="mood.html">心情量表</a></li>
+      <li><a href="diary.html" class="active">心情日記</a></li>
+      <li><a href="community.html">社群</a></li>
+      <li><a href="shop.html">商店</a></li>
+    </ul>
+    <div class="nav-user">
+      <div class="nav-coins-badge">🪙 <span id="nav-coins">0</span></div>
+      <span id="nav-username">使用者</span>
+      <button class="btn-logout" onclick="logout()">登出</button>
+    </div>
+  </nav>
+
+  <main>
+
+    <!-- 分頁標籤 -->
+    <div class="tabs">
+      <button class="tab active" id="tab-btn-write" onclick="switchTab('write')">✏️ 寫日記</button>
+      <button class="tab" id="tab-btn-list"  onclick="switchTab('list')">📖 我的日記</button>
+    </div>
+
+    <!-- ═══ 寫日記 ═══ -->
+    <div id="tab-write">
+      <div class="write-card">
+        <div class="write-date" id="write-date"></div>
+
+        <div class="section-label">選擇今天的花</div>
+        <div class="flower-select" id="flower-select">
+          <div class="flower-chip active" data-icon="🌹" data-name="玫瑰" onclick="pickFlower(this)">🌹 玫瑰</div>
+          <div class="flower-chip" data-icon="🌷" data-name="鬱金香" onclick="pickFlower(this)">🌷 鬱金香</div>
+          <div class="flower-chip" data-icon="🌸" data-name="櫻花" onclick="pickFlower(this)">🌸 櫻花</div>
+          <div class="flower-chip" data-icon="🌻" data-name="向日葵" onclick="pickFlower(this)">🌻 向日葵</div>
+          <div class="flower-chip" data-icon="💐" data-name="薰衣草" onclick="pickFlower(this)">💐 薰衣草</div>
+          <div class="flower-chip" data-icon="🌺" data-name="非洲菊" onclick="pickFlower(this)">🌺 非洲菊</div>
+          <div class="flower-chip" data-icon="🌼" data-name="雛菊" onclick="pickFlower(this)">🌼 雛菊</div>
+          <div class="flower-chip" data-icon="🪷" data-name="百合" onclick="pickFlower(this)">🪷 百合</div>
+        </div>
+
+        <input
+          class="mood-input"
+          id="mood-title"
+          type="text"
+          placeholder="今天的心情標題（例：今天天氣很好）"
+          maxlength="40"
+        />
+
+        <textarea
+          class="content-input"
+          id="mood-content"
+          placeholder="寫下今天的心情與感受...&#10;&#10;你可以記錄今天發生了什麼、現在的感覺、想對自己說的話。"
+          maxlength="500"
+          oninput="updateCount()"
+        ></textarea>
+        <div class="char-count"><span id="char-num">0</span> / 500</div>
+
+        <button class="btn-save" onclick="saveDiary()">儲存今日日記 ✦</button>
+        <div class="save-success" id="save-success">🌸 日記儲存成功！記憶已珍藏。</div>
+      </div>
+    </div>
+
+    <!-- ═══ 日記列表 ═══ -->
+    <div id="tab-list" style="display:none">
+      <div class="list-toolbar">
+        <span class="list-count" id="list-count"></span>
+        <button class="btn-clear" onclick="clearAll()">清除全部</button>
+      </div>
+      <div id="diary-list"></div>
+    </div>
+
+  </main>
+
+  <script src="coins.js"></script>
+  <script>
+    /* ── 登入驗證 ── */
+    const currentUser = localStorage.getItem('fl_current');
+    if (!currentUser) window.location.href = 'index.html';
+    document.getElementById('nav-username').textContent = currentUser;
+    Coins.initNav(currentUser);
+
+    const STORAGE_KEY = 'fl_diaries_' + currentUser;
+
+    /* ── 日期顯示 ── */
+    const now  = new Date();
+    const DAYS = ['日', '一', '二', '三', '四', '五', '六'];
+    document.getElementById('write-date').textContent =
+      now.getFullYear() + ' 年 ' + (now.getMonth() + 1) + ' 月 ' + now.getDate() + ' 日　星期' + DAYS[now.getDay()];
+
+    /* ── 花朵選擇 ── */
+    let selectedFlower = { icon: '🌹', name: '玫瑰' };
+
+    function pickFlower(el) {
+      document.querySelectorAll('.flower-chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      selectedFlower = { icon: el.dataset.icon, name: el.dataset.name };
+    }
+
+    /* ── 字數計算 ── */
+    function updateCount() {
+      const len = document.getElementById('mood-content').value.length;
+      document.getElementById('char-num').textContent = len;
+    }
+
+    /* ── 分頁切換 ── */
+    function switchTab(tab) {
+      document.getElementById('tab-btn-write').classList.toggle('active', tab === 'write');
+      document.getElementById('tab-btn-list').classList.toggle('active',  tab === 'list');
+      document.getElementById('tab-write').style.display = tab === 'write' ? 'block' : 'none';
+      document.getElementById('tab-list').style.display  = tab === 'list'  ? 'block' : 'none';
+      if (tab === 'list') renderList();
+    }
+
+    /* ── 儲存日記 ── */
+    function saveDiary() {
+      const title   = document.getElementById('mood-title').value.trim();
+      const content = document.getElementById('mood-content').value.trim();
+
+      if (!title) {
+        alert('請填寫心情標題！');
+        document.getElementById('mood-title').focus();
+        return;
+      }
+      if (!content) {
+        alert('請寫下今天的心情內容！');
+        document.getElementById('mood-content').focus();
+        return;
+      }
+
+      const entry = {
+        id:         Date.now(),
+        date:       now.getFullYear() + '/' + (now.getMonth() + 1) + '/' + now.getDate(),
+        day:        now.getDate(),
+        month:      now.getMonth() + 1,
+        year:       now.getFullYear(),
+        weekday:    DAYS[now.getDay()],
+        flower:     selectedFlower.icon,
+        flowerName: selectedFlower.name,
+        mood:       title,
+        content:    content,
+      };
+
+      const list = getDiaries();
+      list.push(entry);
+      saveDiaries(list);
+
+      /* ── 花幣獎勵 ── */
+      const earned = Coins.rewardDiary(currentUser);
+      const streak = Coins.rewardStreak(currentUser);
+      let rewardMsg = '🌸 日記儲存成功！記憶已珍藏。';
+      if (earned > 0) rewardMsg += `　+${earned} 花幣 🪙`;
+      if (streak.bonus > 0) rewardMsg += `　連續 ${streak.streak} 天獎勵 +${streak.bonus} 🎉`;
+
+      /* 重置表單 */
+      document.getElementById('mood-title').value   = '';
+      document.getElementById('mood-content').value = '';
+      document.getElementById('char-num').textContent = '0';
+      document.querySelectorAll('.flower-chip').forEach((c, i) =>
+        c.classList.toggle('active', i === 0));
+      selectedFlower = { icon: '🌹', name: '玫瑰' };
+
+      /* 成功提示 */
+      const msg = document.getElementById('save-success');
+      msg.textContent = rewardMsg;
+      msg.style.display = 'block';
+      setTimeout(() => { msg.style.display = 'none'; }, 3000);
+    }
+
+    /* ── 渲染日記列表 ── */
+    function renderList() {
+      const list = getDiaries();
+      const container = document.getElementById('diary-list');
+      document.getElementById('list-count').textContent =
+        '共 ' + list.length + ' 篇日記';
+
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div class="empty">
+            <span class="empty-icon">📖</span>
+            還沒有任何日記<br>
+            去「寫日記」記錄今天的心情吧！
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = [...list].reverse().map(d => `
+        <div class="diary-item" id="item-${d.id}" onclick="toggleExpand(${d.id})">
+          <div class="di-date-col">
+            <div class="di-day">${d.day}</div>
+            <div class="di-month">${d.month}月</div>
+            <div class="di-flower-icon">${d.flower}</div>
+          </div>
+          <div class="di-body">
+            <div class="di-title">${escHtml(d.mood)}</div>
+            <div class="di-preview">${escHtml(d.content)}</div>
+            <div class="di-full">${escHtml(d.content)}</div>
+            <div class="di-meta">
+              <span class="di-tag">${d.flowerName}</span>
+              <span class="di-time">${d.date} 星期${d.weekday}</span>
+            </div>
+          </div>
+          <button class="di-delete" onclick="deleteDiary(event, ${d.id})" title="刪除">×</button>
+        </div>
+      `).join('');
+    }
+
+    /* ── 展開 / 收合 ── */
+    function toggleExpand(id) {
+      const el = document.getElementById('item-' + id);
+      if (el) el.classList.toggle('expanded');
+    }
+
+    /* ── 刪除單篇 ── */
+    function deleteDiary(e, id) {
+      e.stopPropagation();
+      if (!confirm('確定要刪除這篇日記嗎？')) return;
+      const list = getDiaries().filter(d => d.id !== id);
+      saveDiaries(list);
+      renderList();
+    }
+
+    /* ── 清除全部 ── */
+    function clearAll() {
+      const list = getDiaries();
+      if (list.length === 0) { alert('還沒有任何日記！'); return; }
+      if (!confirm('確定要刪除全部 ' + list.length + ' 篇日記嗎？此操作無法復原。')) return;
+      saveDiaries([]);
+      renderList();
+    }
+
+    /* ── localStorage 工具 ── */
+    function getDiaries() {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    }
+    function saveDiaries(list) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    }
+
+    /* ── HTML 跳脫 ── */
+    function escHtml(str) {
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    /* ── 從心情量表帶入資料 ── */
+    function loadFromMood() {
+      const params = new URLSearchParams(window.location.search);
+      const flower = params.get('flower');
+      const mood   = params.get('mood');
+      if (flower) {
+        const chip = [...document.querySelectorAll('.flower-chip')]
+          .find(c => c.dataset.name === flower);
+        if (chip) pickFlower(chip);
+        else {
+          selectedFlower = { icon: '🌸', name: flower };
+        }
+      }
+      if (mood) {
+        document.getElementById('mood-title').value = mood;
+      }
+    }
+
+    /* ── 登出 ── */
+    function logout() {
+      if (confirm('確定要登出嗎？')) {
+        localStorage.removeItem('fl_current');
+        window.location.href = 'index.html';
+      }
+    }
+
+    /* ── 初始化 ── */
+    loadFromMood();
+  </script>
+
+</body>
+</html>

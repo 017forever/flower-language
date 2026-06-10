@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>首頁 · 花語心情</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500&family=Noto+Sans+TC:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      background: #f7f0f5;
+      min-height: 100vh;
+      color: #4a2040;
+    }
+
+    /* ── 導覽列 ── */
+    nav {
+      background: #ffffff;
+      border-bottom: 0.5px solid #e8d5e5;
+      padding: 0 2rem;
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-logo {
+      font-family: 'Noto Serif TC', serif;
+      font-size: 17px;
+      font-weight: 500;
+      color: #4a2040;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+    .nav-logo .flower { font-size: 22px; }
+    .nav-links {
+      display: flex;
+      gap: 4px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 14px;
+      color: #9a7090;
+      text-decoration: none;
+      padding: 7px 12px;
+      border-radius: 10px;
+      transition: background 0.15s, color 0.15s;
+      display: block;
+    }
+    .nav-links a:hover,
+    .nav-links a.active {
+      background: #f5edf3;
+      color: #4a2040;
+    }
+    .nav-user {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #7a5070;
+    }
+    .nav-user .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #fdf0f8;
+      border: 0.5px solid #e0cedd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+    .btn-logout {
+      font-size: 12px;
+      color: #b090a8;
+      background: none;
+      border: 0.5px solid #e0cedd;
+      border-radius: 8px;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-family: 'Noto Sans TC', sans-serif;
+      transition: background 0.15s;
+    }
+    .btn-logout:hover { background: #f5edf3; color: #9a4878; }
+    .nav-coins-badge { display: flex; align-items: center; gap: 5px; background: #fff8e8; border: 0.5px solid #f0d898; border-radius: 20px; padding: 5px 12px; font-size: 13px; font-weight: 500; color: #a07020; }
+
+    /* ── 主內容 ── */
+    main {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    /* ── Hero 區 ── */
+    .hero {
+      background: #ffffff;
+      border-radius: 20px;
+      border: 0.5px solid #e8d5e5;
+      padding: 2rem 2rem 1.75rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '🌸';
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      font-size: 80px;
+      opacity: 0.06;
+      pointer-events: none;
+    }
+    .hero-date {
+      font-size: 12px;
+      color: #b090a8;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.6rem;
+    }
+    .hero h1 {
+      font-family: 'Noto Serif TC', serif;
+      font-size: 24px;
+      font-weight: 500;
+      color: #4a2040;
+      margin-bottom: 0.5rem;
+    }
+    .hero p {
+      font-size: 14px;
+      color: #9a7090;
+      margin-bottom: 1.5rem;
+      line-height: 1.7;
+    }
+    .btn-primary {
+      display: inline-block;
+      background: #b05a8a;
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: 'Noto Sans TC', sans-serif;
+      padding: 11px 28px;
+      border-radius: 24px;
+      text-decoration: none;
+      letter-spacing: 0.06em;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .btn-primary:hover  { background: #9a4878; }
+    .btn-primary:active { transform: scale(0.97); }
+
+    /* ── 區塊標題 ── */
+    .section-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: #7a5070;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 0.5px;
+      background: #e0cedd;
+    }
+    .section { margin-bottom: 1.5rem; }
+
+    /* ── 快速前往卡片 ── */
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .quick-card {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 0.5px solid #e8d5e5;
+      padding: 1.25rem 1rem;
+      text-decoration: none;
+      display: block;
+      transition: border-color 0.15s, transform 0.1s;
+    }
+    .quick-card:hover {
+      border-color: #c07098;
+      transform: translateY(-1px);
+    }
+    .quick-card:active { transform: scale(0.98); }
+    .quick-icon  { font-size: 30px; margin-bottom: 10px; }
+    .quick-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: #4a2040;
+      margin-bottom: 4px;
+    }
+    .quick-desc  { font-size: 12px; color: #9a7090; line-height: 1.6; }
+
+    /* ── 今日花語 ── */
+    .quote-box {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 0.5px solid #e8d5e5;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .quote-icon { font-size: 32px; flex-shrink: 0; line-height: 1; }
+    .quote-text {
+      font-family: 'Noto Serif TC', serif;
+      font-size: 14px;
+      color: #4a2040;
+      line-height: 2;
+    }
+    .quote-src {
+      font-size: 11px;
+      color: #b090a8;
+      margin-top: 6px;
+      font-style: italic;
+    }
+
+    /* ── 最近日記預覽 ── */
+    .diary-empty {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 0.5px dashed #ddc8d8;
+      padding: 2rem;
+      text-align: center;
+      color: #b090a8;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+    .diary-empty .empty-icon { font-size: 32px; display: block; margin-bottom: 8px; }
+    .diary-item {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 0.5px solid #e8d5e5;
+      padding: 1rem 1.25rem;
+      margin-bottom: 8px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      text-decoration: none;
+    }
+    .diary-item:last-child { margin-bottom: 0; }
+    .diary-date { font-size: 11px; color: #b090a8; flex-shrink: 0; padding-top: 2px; }
+    .diary-flower { font-size: 20px; flex-shrink: 0; }
+    .diary-content { flex: 1; }
+    .diary-title { font-size: 13px; font-weight: 500; color: #4a2040; margin-bottom: 3px; }
+    .diary-preview { font-size: 12px; color: #9a7090; line-height: 1.5; }
+
+    /* ── 手機響應式 ── */
+    @media (max-width: 500px) {
+      nav { padding: 0 1rem; }
+      .nav-links { display: none; }
+      main { padding: 1.25rem 1rem 4rem; }
+      .hero { padding: 1.5rem 1.25rem; }
+      .hero h1 { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 導覽列 -->
+  <nav>
+    <a class="nav-logo" href="home.html">
+      <span class="flower">🌸</span> 花語心情
+    </a>
+    <ul class="nav-links">
+      <li><a href="home.html" class="active">首頁</a></li>
+      <li><a href="encyclopedia.html">花語圖鑑</a></li>
+      <li><a href="mood.html">心情量表</a></li>
+      <li><a href="diary.html">心情日記</a></li>
+      <li><a href="community.html">社群</a></li>
+      <li><a href="shop.html">商店</a></li>
+    </ul>
+    <div class="nav-user">
+      <div class="nav-coins-badge">🪙 <span id="nav-coins">0</span></div>
+      <div class="avatar">🌷</div>
+      <span id="nav-username">使用者</span>
+      <button class="btn-logout" onclick="logout()">登出</button>
+    </div>
+  </nav>
+
+  <!-- 主內容 -->
+  <main>
+
+    <!-- Hero -->
+    <div class="hero">
+      <p class="hero-date" id="hero-date"></p>
+      <h1 id="hero-greeting">你好 🌸</h1>
+      <p>今天的心情，用花語來說說吧</p>
+      <a class="btn-primary" href="mood.html">記錄今日心情 ✦</a>
+    </div>
+
+    <!-- 快速前往 -->
+    <div class="section">
+      <div class="section-title">快速前往</div>
+      <div class="quick-grid">
+        <a class="quick-card" href="encyclopedia.html">
+          <div class="quick-icon">🌺</div>
+          <div class="quick-title">花語圖鑑</div>
+          <div class="quick-desc">探索 50+ 種花卉的花語與故事</div>
+        </a>
+        <a class="quick-card" href="mood.html">
+          <div class="quick-icon">📊</div>
+          <div class="quick-title">心情量表</div>
+          <div class="quick-desc">測測今天的情緒，找到你的花</div>
+        </a>
+        <a class="quick-card" href="diary.html">
+          <div class="quick-icon">📖</div>
+          <div class="quick-title">心情日記</div>
+          <div class="quick-desc">記錄每天的心情與感受</div>
+        </a>
+        <a class="quick-card" href="diary.html#stats">
+          <div class="quick-icon">🌼</div>
+          <div class="quick-title">我的花朵</div>
+          <div class="quick-desc">查看你收集到的花語紀錄</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- 今日花語 -->
+    <div class="section">
+      <div class="section-title">今日花語</div>
+      <div class="quote-box">
+        <div class="quote-icon" id="daily-icon">🌹</div>
+        <div>
+          <div class="quote-text" id="daily-quote">玫瑰代表熱烈的愛與勇氣，<br>願你今天帶著這份力量，<br>勇敢面對每一個當下。</div>
+          <div class="quote-src" id="daily-src">— 玫瑰 · Rosa</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 最近日記 -->
+    <div class="section">
+      <div class="section-title">最近記錄</div>
+      <div id="recent-diary"></div>
+    </div>
+
+  </main>
+
+  <script src="coins.js"></script>
+  <script>
+    /* ── 登入驗證 ── */
+    const currentUser = localStorage.getItem('fl_current');
+    if (!currentUser) {
+      window.location.href = 'index.html';
+    }
+
+    /* ── 顯示使用者名稱 & 花幣 ── */
+    document.getElementById('nav-username').textContent = currentUser;
+    Coins.initNav(currentUser);
+
+    /* ── 日期與問候 ── */
+    const now = new Date();
+    const days = ['日', '一', '二', '三', '四', '五', '六'];
+    document.getElementById('hero-date').textContent =
+      now.getFullYear() + ' 年 ' + (now.getMonth() + 1) + ' 月 ' + now.getDate() + ' 日　星期' + days[now.getDay()];
+
+    function getGreeting() {
+      const h = now.getHours();
+      if (h < 6)  return '深夜好';
+      if (h < 12) return '早安';
+      if (h < 14) return '午安';
+      if (h < 18) return '下午好';
+      if (h < 22) return '晚安';
+      return '夜深了';
+    }
+    document.getElementById('hero-greeting').textContent =
+      getGreeting() + '，' + currentUser + ' 🌸';
+
+    /* ── 每日花語輪替 ── */
+    const dailyFlowers = [
+      { icon: '🌹', quote: '玫瑰代表熱烈的愛與勇氣，<br>願你今天帶著這份力量，<br>勇敢面對每一個當下。', src: '— 玫瑰 · Rosa' },
+      { icon: '🌷', quote: '鬱金香象徵溫柔的告白，<br>有些話不需要說出口，<br>心意自然會傳遞給對方。', src: '— 鬱金香 · Tulipa' },
+      { icon: '🌸', quote: '櫻花代表生命的短暫與美麗，<br>珍惜眼前每一個瞬間，<br>因為它們都是禮物。', src: '— 櫻花 · Prunus' },
+      { icon: '🌼', quote: '向日葵象徵對光明的追求，<br>無論今天多麼疲憊，<br>記得抬起頭來看看太陽。', src: '— 向日葵 · Helianthus' },
+      { icon: '💐', quote: '薰衣草代表寧靜與療癒，<br>讓自己偶爾慢下來，<br>深呼吸，感受當下的安靜。', src: '— 薰衣草 · Lavandula' },
+      { icon: '🌺', quote: '扶桑象徵熱情與美麗，<br>你本身就是一朵花，<br>綻放屬於你自己的色彩。', src: '— 扶桑 · Hibiscus' },
+      { icon: '🌻', quote: '雛菊代表純真與新的開始，<br>每一天都是重新出發的機會，<br>保持那份最初的純粹。', src: '— 雛菊 · Bellis' },
+    ];
+
+    const idx = now.getDay(); // 以星期幾決定顯示哪朵花
+    const today = dailyFlowers[idx];
+    document.getElementById('daily-icon').textContent = today.icon;
+    document.getElementById('daily-quote').innerHTML = today.quote;
+    document.getElementById('daily-src').textContent = today.src;
+
+    /* ── 最近日記 ── */
+    function renderRecentDiary() {
+      const container = document.getElementById('recent-diary');
+      const key = 'fl_diaries_' + currentUser;
+      const diaries = JSON.parse(localStorage.getItem(key) || '[]');
+
+      if (diaries.length === 0) {
+        container.innerHTML = `
+          <div class="diary-empty">
+            <span class="empty-icon">📖</span>
+            還沒有任何記錄<br>
+            去寫下今天的第一篇心情日記吧！
+          </div>`;
+        return;
+      }
+
+      // 顯示最新 3 筆
+      const recent = [...diaries].reverse().slice(0, 3);
+      container.innerHTML = recent.map(d => `
+        <a class="diary-item" href="diary.html">
+          <div class="diary-flower">${d.flower || '🌸'}</div>
+          <div class="diary-content">
+            <div class="diary-title">${d.mood || '今天的心情'}</div>
+            <div class="diary-preview">${(d.content || '').slice(0, 40)}${d.content && d.content.length > 40 ? '...' : ''}</div>
+          </div>
+          <div class="diary-date">${d.date || ''}</div>
+        </a>
+      `).join('');
+    }
+
+    renderRecentDiary();
+
+    /* ── 登出 ── */
+    function logout() {
+      if (confirm('確定要登出嗎？')) {
+        localStorage.removeItem('fl_current');
+        window.location.href = 'index.html';
+      }
+    }
+  </script>
+
+</body>
+</html>

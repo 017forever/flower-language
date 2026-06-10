@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>花幣商店 · 花語心情</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500&family=Noto+Sans+TC:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      background: #f7f0f5;
+      min-height: 100vh;
+      color: #4a2040;
+    }
+
+    /* ── 導覽列 ── */
+    nav {
+      background: #ffffff;
+      border-bottom: 0.5px solid #e8d5e5;
+      padding: 0 2rem;
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-logo {
+      font-family: 'Noto Serif TC', serif;
+      font-size: 17px;
+      font-weight: 500;
+      color: #4a2040;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .nav-links { display: flex; gap: 4px; list-style: none; }
+    .nav-links a {
+      font-size: 14px;
+      color: #9a7090;
+      text-decoration: none;
+      padding: 7px 12px;
+      border-radius: 10px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .nav-links a:hover,
+    .nav-links a.active { background: #f5edf3; color: #4a2040; }
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: #7a5070;
+    }
+    .nav-coins-badge {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: #fff8e8;
+      border: 0.5px solid #f0d898;
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #a07020;
+    }
+    .btn-logout {
+      font-size: 12px;
+      color: #b090a8;
+      background: none;
+      border: 0.5px solid #e0cedd;
+      border-radius: 8px;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-family: 'Noto Sans TC', sans-serif;
+    }
+    .btn-logout:hover { background: #f5edf3; }
+
+    /* ── 主內容 ── */
+    main {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    /* ── 頁首 ── */
+    .page-header { margin-bottom: 1.75rem; }
+    .page-header h1 {
+      font-family: 'Noto Serif TC', serif;
+      font-size: 22px;
+      font-weight: 500;
+      color: #4a2040;
+      margin-bottom: 4px;
+    }
+    .page-header p { font-size: 14px; color: #9a7090; }
+
+    /* ── 花幣資訊卡 ── */
+    .coins-info {
+      background: linear-gradient(135deg, #fff8e8 0%, #fdf0f8 100%);
+      border: 0.5px solid #f0d898;
+      border-radius: 18px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .coins-main {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .coins-icon { font-size: 36px; }
+    .coins-label { font-size: 12px; color: #a07020; margin-bottom: 2px; }
+    .coins-amount {
+      font-size: 28px;
+      font-weight: 500;
+      color: #7a5010;
+      line-height: 1;
+    }
+    .coins-unit { font-size: 14px; color: #a07020; margin-left: 4px; }
+    .coins-how {
+      font-size: 12px;
+      color: #9a7090;
+      text-align: right;
+      line-height: 1.9;
+    }
+
+    /* ── 任務獲幣提示 ── */
+    .earn-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 1.75rem;
+    }
+    .earn-card {
+      background: #ffffff;
+      border-radius: 14px;
+      border: 0.5px solid #e8d5e5;
+      padding: 1rem;
+      text-align: center;
+    }
+    .earn-icon  { font-size: 24px; margin-bottom: 6px; }
+    .earn-title { font-size: 13px; font-weight: 500; color: #4a2040; margin-bottom: 3px; }
+    .earn-coin  { font-size: 12px; color: #b07030; }
+    .earn-done  {
+      display: inline-block;
+      font-size: 11px;
+      padding: 2px 8px;
+      background: #f0fdf5;
+      color: #5aaa7a;
+      border-radius: 8px;
+      margin-top: 4px;
+    }
+
+    /* ── 區塊標題 ── */
+    .section-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: #7a5070;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 0.5px;
+      background: #e0cedd;
+    }
+    .section { margin-bottom: 1.75rem; }
+
+    /* ── 商品卡片 ── */
+    .shop-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .shop-card {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 0.5px solid #e8d5e5;
+      padding: 1.25rem 1rem;
+      text-align: center;
+      position: relative;
+      transition: border-color 0.15s, transform 0.1s;
+    }
+    .shop-card:hover { border-color: #c07098; transform: translateY(-1px); }
+    .shop-card.owned {
+      background: #f8fdf8;
+      border-color: #b0e8c8;
+    }
+    .shop-card.equipped {
+      background: #fdf5ff;
+      border-color: #c07098;
+    }
+
+    .item-preview {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      margin: 0 auto 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+    }
+    .item-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: #4a2040;
+      margin-bottom: 4px;
+    }
+    .item-desc {
+      font-size: 12px;
+      color: #9a7090;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+    .item-price {
+      font-size: 13px;
+      color: #a07020;
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+    .btn-buy {
+      width: 100%;
+      padding: 8px;
+      background: #b05a8a;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 13px;
+      font-family: 'Noto Sans TC', sans-serif;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-buy:hover    { background: #9a4878; }
+    .btn-buy.btn-equip { background: #7a9ad0; }
+    .btn-buy.btn-equip:hover { background: #5a80c0; }
+    .btn-buy.btn-equipped { background: #5aaa7a; cursor: default; }
+    .btn-buy:disabled { background: #e0cedd; cursor: not-allowed; }
+
+    .owned-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 8px;
+      background: #f0fdf5;
+      color: #5aaa7a;
+      border: 0.5px solid #b0e8c8;
+    }
+
+    /* ── 已裝備稱號顯示 ── */
+    .title-display {
+      background: #ffffff;
+      border-radius: 14px;
+      border: 0.5px solid #e8d5e5;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.75rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .title-display-label { font-size: 12px; color: #9a7090; }
+    .title-display-value {
+      font-size: 15px;
+      font-weight: 500;
+      color: #b05a8a;
+      font-family: 'Noto Serif TC', serif;
+    }
+
+    /* ── 提示訊息 ── */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #4a2040;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 24px;
+      font-size: 14px;
+      opacity: 0;
+      transition: all 0.3s;
+      pointer-events: none;
+      z-index: 999;
+      white-space: nowrap;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 560px) {
+      nav { padding: 0 1rem; }
+      .nav-links { display: none; }
+      main { padding: 1.25rem 1rem 4rem; }
+      .shop-grid  { grid-template-columns: repeat(2, 1fr); }
+      .earn-grid  { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a class="nav-logo" href="home.html">🌸 花語心情</a>
+    <ul class="nav-links">
+      <li><a href="home.html">首頁</a></li>
+      <li><a href="encyclopedia.html">花語圖鑑</a></li>
+      <li><a href="mood.html">心情量表</a></li>
+      <li><a href="diary.html">心情日記</a></li>
+      <li><a href="community.html">社群</a></li>
+      <li><a href="shop.html" class="active">商店</a></li>
+    </ul>
+    <div class="nav-right">
+      <div class="nav-coins-badge">🪙 <span id="nav-coins">0</span></div>
+      <span id="nav-username"></span>
+      <button class="btn-logout" onclick="logout()">登出</button>
+    </div>
+  </nav>
+
+  <main>
+    <div class="page-header">
+      <h1>🪙 花幣商店</h1>
+      <p>用花幣兌換專屬道具，讓你的日記更有個性！</p>
+    </div>
+
+    <!-- 花幣資訊 -->
+    <div class="coins-info">
+      <div class="coins-main">
+        <div class="coins-icon">🪙</div>
+        <div>
+          <div class="coins-label">我的花幣</div>
+          <div class="coins-amount"><span id="coins-display">0</span><span class="coins-unit">枚</span></div>
+        </div>
+      </div>
+      <div class="coins-how">
+        ✏️ 寫日記 +10 幣<br>
+        📊 心情量表 +5 幣<br>
+        🔥 連續 7 天 +50 幣
+      </div>
+    </div>
+
+    <!-- 任務狀態 -->
+    <div class="section">
+      <div class="section-title">今日任務</div>
+      <div class="earn-grid">
+        <div class="earn-card">
+          <div class="earn-icon">✏️</div>
+          <div class="earn-title">寫日記</div>
+          <div class="earn-coin">+10 花幣</div>
+          <div class="earn-done" id="task-diary" style="display:none">✓ 已完成</div>
+        </div>
+        <div class="earn-card">
+          <div class="earn-icon">📊</div>
+          <div class="earn-title">心情量表</div>
+          <div class="earn-coin">+5 花幣</div>
+          <div class="earn-done" id="task-mood" style="display:none">✓ 已完成</div>
+        </div>
+        <div class="earn-card">
+          <div class="earn-icon">🔥</div>
+          <div class="earn-title">連續 <span id="streak-num">0</span> 天</div>
+          <div class="earn-coin">7天 +50 幣</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 目前稱號 -->
+    <div class="title-display" id="title-display" style="display:none">
+      <div class="coins-icon">👑</div>
+      <div>
+        <div class="title-display-label">目前稱號</div>
+        <div class="title-display-value" id="equipped-title-text"></div>
+      </div>
+    </div>
+
+    <!-- 稱號 -->
+    <div class="section">
+      <div class="section-title">👑 稱號</div>
+      <div class="shop-grid" id="grid-title"></div>
+    </div>
+
+    <!-- 日記背景主題 -->
+    <div class="section">
+      <div class="section-title">🎨 日記背景主題</div>
+      <div class="shop-grid" id="grid-theme"></div>
+    </div>
+
+    <!-- 特殊花朵貼紙 -->
+    <div class="section">
+      <div class="section-title">🌟 特殊花朵貼紙</div>
+      <div class="shop-grid" id="grid-sticker"></div>
+    </div>
+
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="coins.js"></script>
+  <script>
+    /* ── 登入驗證 ── */
+    const currentUser = localStorage.getItem('fl_current');
+    if (!currentUser) window.location.href = 'index.html';
+    document.getElementById('nav-username').textContent = currentUser;
+    Coins.initNav(currentUser);
+
+    /* ── 商品資料 ── */
+    const SHOP_ITEMS = {
+      title: [
+        { id: 'title_beginner',  name: '花語初心者', desc: '剛踏上花語之旅', price: 30,  preview: '🌱', bg: '#f0fdf5' },
+        { id: 'title_writer',    name: '日記達人',   desc: '堅持記錄的人',   price: 80,  preview: '✍️', bg: '#f0f4ff' },
+        { id: 'title_master',    name: '花語大師',   desc: '深諳花語之道',   price: 150, preview: '🌸', bg: '#fdf0f8' },
+        { id: 'title_legend',    name: '花園傳說',   desc: '最高榮譽稱號',   price: 300, preview: '👑', bg: '#fff8e0' },
+        { id: 'title_healer',    name: '心靈療癒師', desc: '溫柔守護他人',   price: 120, preview: '💜', bg: '#f5f0ff' },
+        { id: 'title_sunshine',  name: '陽光少女',   desc: '永遠充滿活力',   price: 100, preview: '☀️', bg: '#fffbe0' },
+      ],
+      theme: [
+        { id: 'theme_pink',    name: '玫瑰粉',   desc: '溫柔粉嫩的日記風格', price: 50,  preview: '🌸', bg: '#fdf0f8', color: '#fdf0f8' },
+        { id: 'theme_purple',  name: '薰衣草紫', desc: '夢幻紫色的日記風格', price: 50,  preview: '💜', bg: '#f5f0ff', color: '#f5f0ff' },
+        { id: 'theme_blue',    name: '晴空藍',   desc: '清爽藍色的日記風格', price: 50,  preview: '💙', bg: '#f0f4ff', color: '#f0f4ff' },
+        { id: 'theme_green',   name: '森林綠',   desc: '清新自然的日記風格', price: 50,  preview: '🌿', bg: '#f0fdf5', color: '#f0fdf5' },
+        { id: 'theme_peach',   name: '蜜桃橘',   desc: '甜蜜溫暖的日記風格', price: 60,  preview: '🍑', bg: '#fff5f0', color: '#fff5f0' },
+        { id: 'theme_night',   name: '星夜深藍', desc: '神秘深邃的日記風格', price: 100, preview: '🌙', bg: '#f0f2ff', color: '#f0f2ff' },
+      ],
+      sticker: [
+        { id: 'sticker_star',    name: '✨ 星光',   desc: '閃閃發光的星星貼紙', price: 30, preview: '✨', bg: '#fff8e0' },
+        { id: 'sticker_heart',   name: '💖 愛心',   desc: '粉嫩愛心花朵貼紙',   price: 30, preview: '💖', bg: '#fdf0f8' },
+        { id: 'sticker_rainbow', name: '🌈 彩虹',   desc: '繽紛彩虹貼紙組',     price: 40, preview: '🌈', bg: '#f5f8ff' },
+        { id: 'sticker_fairy',   name: '🧚 精靈',   desc: '花園小精靈貼紙',     price: 50, preview: '🧚', bg: '#f5fff0' },
+        { id: 'sticker_moon',    name: '🌙 月亮',   desc: '夜晚月亮系列貼紙',   price: 40, preview: '🌙', bg: '#f0f2ff' },
+        { id: 'sticker_cherry',  name: '🌺 花火',   desc: '絢麗花火貼紙',       price: 60, preview: '🌺', bg: '#fff0f0' },
+      ],
+    };
+
+    /* ── 渲染商品 ── */
+    function renderShop() {
+      const inv = Inventory.get(currentUser);
+      const equippedTitle = Inventory.getEquipped(currentUser, 'title');
+      const equippedTheme = Inventory.getEquipped(currentUser, 'theme');
+
+      // 更新稱號顯示
+      if (equippedTitle) {
+        const t = SHOP_ITEMS.title.find(i => i.id === equippedTitle);
+        if (t) {
+          document.getElementById('title-display').style.display = 'flex';
+          document.getElementById('equipped-title-text').textContent = t.name;
+        }
+      }
+
+      ['title', 'theme', 'sticker'].forEach(cat => {
+        const grid = document.getElementById('grid-' + cat);
+        grid.innerHTML = SHOP_ITEMS[cat].map(item => {
+          const owned    = inv.includes(item.id);
+          const equipped = (cat === 'title' && equippedTitle === item.id) ||
+                           (cat === 'theme' && equippedTheme === item.id);
+          const canAfford = Coins.get(currentUser) >= item.price;
+
+          let btnHtml = '';
+          if (equipped) {
+            btnHtml = `<button class="btn-buy btn-equipped" disabled>✓ 已裝備</button>`;
+          } else if (owned && (cat === 'title' || cat === 'theme')) {
+            btnHtml = `<button class="btn-buy btn-equip" onclick="equipItem('${cat}','${item.id}')">裝備</button>`;
+          } else if (owned) {
+            btnHtml = `<button class="btn-buy btn-equipped" disabled>✓ 已擁有</button>`;
+          } else {
+            btnHtml = `<button class="btn-buy" onclick="buyItem('${item.id}',${item.price},'${cat}')" ${!canAfford ? 'disabled title="花幣不足"' : ''}>購買 🪙${item.price}</button>`;
+          }
+
+          return `
+            <div class="shop-card ${equipped ? 'equipped' : owned ? 'owned' : ''}">
+              ${owned ? '<div class="owned-badge">已擁有</div>' : ''}
+              <div class="item-preview" style="background:${item.bg}">${item.preview}</div>
+              <div class="item-name">${item.name}</div>
+              <div class="item-desc">${item.desc}</div>
+              ${!owned ? `<div class="item-price">🪙 ${item.price} 花幣</div>` : ''}
+              ${btnHtml}
+            </div>`;
+        }).join('');
+      });
+    }
+
+    /* ── 購買 ── */
+    function buyItem(itemId, price, cat) {
+      const success = Coins.spend(currentUser, price);
+      if (!success) {
+        showToast('花幣不足！繼續寫日記來賺取花幣 🌸');
+        return;
+      }
+      Inventory.add(currentUser, itemId);
+      document.getElementById('coins-display').textContent = Coins.get(currentUser);
+      showToast('購買成功！🎉');
+      renderShop();
+    }
+
+    /* ── 裝備 ── */
+    function equipItem(slot, itemId) {
+      Inventory.equip(currentUser, slot, itemId);
+      showToast('裝備成功！✨');
+      renderShop();
+    }
+
+    /* ── Toast 提示 ── */
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 2200);
+    }
+
+    /* ── 今日任務狀態 ── */
+    function renderTasks() {
+      if (Coins.doneToday(currentUser, 'diary'))
+        document.getElementById('task-diary').style.display = 'inline-block';
+      if (Coins.doneToday(currentUser, 'mood'))
+        document.getElementById('task-mood').style.display = 'inline-block';
+      document.getElementById('streak-num').textContent = Coins.getStreak(currentUser);
+      document.getElementById('coins-display').textContent = Coins.get(currentUser);
+    }
+
+    /* ── 登出 ── */
+    function logout() {
+      if (confirm('確定要登出嗎？')) {
+        localStorage.removeItem('fl_current');
+        window.location.href = 'index.html';
+      }
+    }
+
+    /* ── 初始化 ── */
+    renderTasks();
+    renderShop();
+  </script>
+
+</body>
+</html>
