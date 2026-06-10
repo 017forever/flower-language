@@ -292,8 +292,7 @@
       if (users[username] && users[username] === password) {
         localStorage.setItem('fl_current', username);
         showMsg('登入成功！歡迎回來，' + username + ' 🌸', 'success');
-        // 登入後跳轉主頁（取消以下註解）
-        // setTimeout(() => { window.location.href = 'home.html'; }, 800);
+        setTimeout(() => { window.location.href = 'home.html'; }, 800);
       } else {
         showMsg('帳號或密碼錯誤，請再試一次');
       }
